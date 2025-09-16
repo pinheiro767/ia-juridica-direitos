@@ -60,6 +60,7 @@ knowledge_base = {
     }
 }
 
+
 # ===== Função para buscar artigos no PubMed =====
 def listar_artigos(query, max_results=3):
     base_url = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/"
@@ -122,9 +123,9 @@ def responder(pergunta: str, conversa: list) -> str:
     # Se a pergunta atual não tiver tema, verifica o histórico
     if not tema_identificado and len(conversa) > 1:
         ultima_mensagem_ia = conversa[-1]['text'].lower()
-        if "sobre tdah" in ultima_mensagem_ia:
+        if "tdah" in ultima_mensagem_ia:
             tema_identificado = "tdah"
-        elif "sobre vítimas de narcisismo" in ultima_mensagem_ia:
+        elif "narcisismo" in ultima_mensagem_ia:
             tema_identificado = "vitimas_narcisistas"
 
     # Lógica de resposta
