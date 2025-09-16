@@ -1,0 +1,35 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.sqlite3
+*.db
+
+# Ambiente virtual
+venv/
+.env/
+*.env
+
+# Logs
+*.log
+*.out
+*.err
+
+# IDEs e editores
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Sistema operacional
+.DS_Store
+Thumbs.db
+
+# Arquivos temporários
+*.tmp
+*.bak
+
+# Render / Deploy
+.pytest_cache/
+.coverage

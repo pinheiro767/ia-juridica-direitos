@@ -59,6 +59,7 @@ knowledge_base = {
     }
 }
 
+
 # ===== Função para buscar artigos no PubMed =====
 def listar_artigos(query, max_results=3):
     base_url = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/"
@@ -80,6 +81,7 @@ def listar_artigos(query, max_results=3):
             artigos.append(f"- {titulo} ({ano}) - {journal}. DOI: {doi}")
     
     return "📚 Artigos científicos recentes:\n\n" + "\n".join(artigos) if artigos else "Não encontrei artigos recentes sobre este tema."
+
 
 # ===== Função para responder =====
 def responder(pergunta: str, conversa: list) -> str:
@@ -151,9 +153,10 @@ def responder(pergunta: str, conversa: list) -> str:
     
     return "Não encontrei informações específicas para essa pergunta. Por favor, especifique um tema como 'TDAH' ou 'vítimas de narcisismo'."
 
+
 # ========= Flask =========
 app = Flask(__name__)
-app.secret_key = "chave_super_secreta_fixa"  # agora é fixa
+app.secret_key = "chave_super_secreta_fixa"  # chave fixa
 
 # conversa global
 conversa_global = [
@@ -279,6 +282,7 @@ def home():
         resposta_ia = responder(pergunta_usuario, conversa_global)
         conversa_global.append({'role': 'ai', 'text': resposta_ia})
     return render_template_string(html_template, conversa=conversa_global)
+
 
 if __name__ == "__main__":
     app.run(debug=True, host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
