@@ -155,12 +155,120 @@ def responder(pergunta: str, conversa: list) -> str:
 app = Flask(__name__)
 app.secret_key = "chave_super_secreta_fixa"  # agora é fixa
 
-# conversa global (não depende de session no Render)
+# conversa global
 conversa_global = [
     {'role': 'ai', 'text': 'AVISO LEGAL: Sou um assistente de informação sobre direitos, não um advogado. Procure sempre um profissional jurídico para orientação formal.\n\nOlá! Bem-vindo(a) ao Módulo V do curso IA e o Sistema Nervoso. Posso te ajudar com dúvidas sobre direitos de TDAH e vítimas de abuso narcisista.'}
 ]
 
-html_template = """ ... (o mesmo HTML que você já tinha) ... """
+# HTML completo
+html_template = """
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Assistência IA da Prof. Cláudia Pinheiro</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f0f2f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+        .container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 500px;
+            display: flex;
+            flex-direction: column;
+            height: 80vh;
+        }
+        h1 {
+            color: #2c3e50;
+            font-weight: 600;
+            text-align: center;
+            margin-top: 0;
+            margin-bottom: 20px;
+        }
+        .chat-container {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 10px;
+            border: 1px solid #bdc3c7;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+        .message {
+            margin-bottom: 10px;
+            padding: 10px 15px;
+            border-radius: 20px;
+            max-width: 70%;
+        }
+        .user-message {
+            background-color: #2980b9;
+            color: white;
+            align-self: flex-end;
+            text-align: right;
+            border-bottom-right-radius: 5px;
+        }
+        .ai-message {
+            background-color: #ecf0f1;
+            color: black;
+            align-self: flex-start;
+            text-align: left;
+            border-bottom-left-radius: 5px;
+        }
+        form {
+            display: flex;
+            gap: 10px;
+        }
+        input[type="text"] {
+            flex-grow: 1;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid #bdc3c7;
+            font-family: 'Poppins', sans-serif;
+        }
+        button {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            background-color: #2980b9;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #2471a5;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Assistência IA da Prof. Cláudia Pinheiro</h1>
+        <div class="chat-container">
+            {% for msg in conversa %}
+            <div class="message {% if msg.role == 'user' %}user-message{% else %}ai-message{% endif %}">
+                <p>{{ msg.text | replace('\n', '<br>') | safe }}</p>
+            </div>
+            {% endfor %}
+        </div>
+        <form method="post">
+            <input type="text" name="pergunta" placeholder="Digite sua mensagem...">
+            <button type="submit">Enviar</button>
+        </form>
+    </div>
+</body>
+</html>
+"""
 
 @app.route("/", methods=["GET", "POST"])
 def home():
