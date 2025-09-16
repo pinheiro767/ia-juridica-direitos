@@ -4,7 +4,7 @@ from xml.etree import ElementTree
 import os
 import random
 
-# ===== Banco de conhecimento resumido (já existente) =====
+# ===== Banco de conhecimento resumido =====
 knowledge_base = {
     "TDAH": {
         "definicao": "O TDAH é um transtorno do neurodesenvolvimento que afeta atenção, impulsividade e organização.",
@@ -60,19 +60,16 @@ knowledge_base = {
     }
 }
 
-
 # ===== Função para buscar artigos no PubMed =====
 def listar_artigos(query, max_results=3):
     base_url = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/"
     
-    # Passo 1: Buscar IDs
     search_url = f"{base_url}esearch.fcgi?db=pubmed&term={query}&retmax={max_results}&retmode=json"
     search_resp = requests.get(search_url).json()
     ids = search_resp.get("esearchresult", {}).get("idlist", [])
     
     artigos = []
     
-    # Passo 2: Obter detalhes
     if ids:
         fetch_url = f"{base_url}efetch.fcgi?db=pubmed&id={','.join(ids)}&retmode=xml"
         fetch_resp = requests.get(fetch_url)
@@ -90,7 +87,6 @@ def listar_artigos(query, max_results=3):
         return "📚 Artigos científicos recentes:\n\n" + "\n".join(artigos)
     else:
         return "Não encontrei artigos recentes sobre este tema."
-
 
 # ===== Função para responder com base no JSON =====
 def responder(pergunta: str) -> str:
