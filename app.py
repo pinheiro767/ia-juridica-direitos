@@ -60,6 +60,7 @@ knowledge_base = {
     }
 }
 
+
 # ===== Função para buscar artigos no PubMed =====
 def listar_artigos(query, max_results=3):
     base_url = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/"
@@ -91,49 +92,67 @@ def listar_artigos(query, max_results=3):
 # ===== Função para responder com base no JSON =====
 def responder(pergunta: str) -> str:
     pergunta_lower = pergunta.lower()
+    
+    # Dicionários de palavras-chave para identificar tema e área
+    temas_keywords = {
+        "tdah": ["tdah", "deficit de atencao"],
+        "vitimas_narcisistas": ["narcisista", "abuso", "psicologico", "narcisismo"]
+    }
 
-    # Detectar intenção de buscar artigos
+    areas_keywords = {
+        "trabalho": ["trabalho", "emprego", "empresa", "carreira"],
+        "educacao": ["escola", "faculdade", "curso", "educacao", "aluno"],
+        "saude": ["saude", "medico", "psicologo", "tratamento", "sus"],
+        "juridico": ["lei", "crime", "violencia", "protetiva", "policia", "juridico", "direito"]
+    }
+
+    tema_identificado = None
+    for tema_key, keywords in temas_keywords.items():
+        if any(word in pergunta_lower for word in keywords):
+            tema_identificado = tema_key
+            break
+            
+    area_identificada = None
+    for area_key, keywords in areas_keywords.items():
+        if any(word in pergunta_lower for word in keywords):
+            area_identificada = area_key
+            break
+
+    # Lógica de resposta
     if "artigo" in pergunta_lower or "científico" in pergunta_lower or "pubmed" in pergunta_lower:
-        if "tdah" in pergunta_lower:
+        if tema_identificado == "tdah":
             return listar_artigos("ADHD AND workplace")
-        elif "narcis" in pergunta_lower or "abuso" in pergunta_lower:
+        elif tema_identificado == "vitimas_narcisistas":
             return listar_artigos("narcissistic abuse psychological violence")
         else:
-            return "Posso buscar artigos científicos sobre TDAH ou abuso narcisista. Qual você prefere?"
+            return "Por favor, especifique o tema (TDAH ou narcisismo) para que eu possa buscar artigos."
+    
+    if tema_identificado and area_identificada:
+        dados = knowledge_base.get(tema_identificado, {})
+        info = dados.get(area_identificada, {})
+        
+        if info:
+            resposta = f"📌 Tema: {tema_identificado.upper().replace('_', ' ')}\n\n"
+            if 'definicao' in dados:
+                resposta += f"**Definição:** {dados['definicao']}\n\n"
+            resposta += f"**Direitos garantidos:**\n- " + "\n- ".join(info.get("direitos", [])) + "\n\n"
+            if "status" in info:
+                resposta += f"**Status atual:** {info['status']}\n\n"
+            if "projetos" in info:
+                resposta += "**Projetos em tramitação:**\n- " + "\n- ".join(info["projetos"]) + "\n\n"
+            if "como_acessar" in info:
+                resposta += "**Como acessar:**\n- " + "\n- ".join(info["como_acessar"])
+            return resposta
+        else:
+            return f"Não encontrei informações sobre {area_identificada} para o tema {tema_identificado}."
+    
+    if tema_identificado and not area_identificada:
+        return f"Encontrei informações sobre {tema_identificado.upper().replace('_', ' ')}. Por favor, especifique a área: trabalho, educação, saúde ou jurídico?"
 
-    # Identificar tema
-    if "tdah" in pergunta_lower:
-        tema = "TDAH"
-    elif "narcis" in pergunta_lower or "abuso" in pergunta_lower or "psicológic" in pergunta_lower:
-        tema = "vitimas_narcisistas"
-    else:
-        return "Não encontrei informações específicas para essa pergunta."
-
-    dados = knowledge_base[tema]
-
-    # Identificar área
-    if any(word in pergunta_lower for word in ["trabalho", "emprego", "empresa"]):
-        area = "trabalho"
-    elif any(word in pergunta_lower for word in ["lei", "crime", "violência", "protetiva", "polícia"]):
-        area = "juridico"
-    else:
-        area = None
-
-    resposta = f"📌 Tema: {tema}\n\n{dados['definicao']}\n\n"
-
-    if area and area in dados:
-        info = dados[area]
-        resposta += f"**Direitos garantidos:**\n- " + "\n- ".join(info.get("direitos", [])) + "\n\n"
-        if "status" in info:
-            resposta += f"**Status atual:** {info['status']}\n\n"
-        if "projetos" in info:
-            resposta += "**Projetos em tramitação:**\n- " + "\n- ".join(info["projetos"]) + "\n\n"
-        if "como_acessar" in info:
-            resposta += "**Como acessar:**\n- " + "\n- ".join(info["como_acessar"])
-    else:
-        resposta += "Posso detalhar nas áreas de saúde, educação, trabalho ou jurídico. Qual delas você gostaria?"
-
-    return resposta
+    if area_identificada and not tema_identificado:
+        return f"Encontrei informações sobre a área {area_identificada}. Por favor, especifique o tema: TDAH ou vítimas de narcisismo?"
+    
+    return "Não encontrei informações específicas para essa pergunta. Por favor, especifique um tema como 'TDAH' ou 'vítimas de narcisismo'."
 
 
 # ========= FIM DO SEU CÓDIGO ========
@@ -147,7 +166,7 @@ html_template = """
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Assistência IA da Prof. Cláudia Pinheiro</title>
+    <title>Assistência IA Prof. Cláudia Pinheiro</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
         body {
