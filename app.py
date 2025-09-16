@@ -60,7 +60,6 @@ knowledge_base = {
     }
 }
 
-
 # ===== Função para buscar artigos no PubMed =====
 def listar_artigos(query, max_results=3):
     base_url = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/"
@@ -292,7 +291,6 @@ def home():
         pergunta_usuario = request.form["pergunta"]
         session['conversa'].append({'role': 'user', 'text': pergunta_usuario})
         
-        # Passa a conversa inteira para a função responder para que ela entenda o contexto
         resposta_ia = responder(pergunta_usuario, session['conversa'])
         session['conversa'].append({'role': 'ai', 'text': resposta_ia})
         
