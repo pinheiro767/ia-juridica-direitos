@@ -90,7 +90,7 @@ def listar_artigos(query, max_results=3):
         return "Não encontrei artigos recentes sobre este tema."
 
 # ===== Função para responder com base no JSON =====
-def responder(pergunta: str) -> str:
+def responder(pergunta: str, conversa: list) -> str:
     pergunta_lower = pergunta.lower()
     
     # Dicionários de palavras-chave para identificar tema e área
@@ -107,16 +107,26 @@ def responder(pergunta: str) -> str:
     }
 
     tema_identificado = None
+    area_identificada = None
+
+    # Tenta identificar o tema e a área na pergunta atual
     for tema_key, keywords in temas_keywords.items():
         if any(word in pergunta_lower for word in keywords):
             tema_identificado = tema_key
             break
             
-    area_identificada = None
     for area_key, keywords in areas_keywords.items():
         if any(word in pergunta_lower for word in keywords):
             area_identificada = area_key
             break
+
+    # Se a pergunta atual não tiver tema, verifica o histórico
+    if not tema_identificado and len(conversa) > 1:
+        ultima_mensagem_ia = conversa[-1]['text'].lower()
+        if "sobre tdah" in ultima_mensagem_ia:
+            tema_identificado = "tdah"
+        elif "sobre vítimas de narcisismo" in ultima_mensagem_ia:
+            tema_identificado = "vitimas_narcisistas"
 
     # Lógica de resposta
     if "artigo" in pergunta_lower or "científico" in pergunta_lower or "pubmed" in pergunta_lower:
@@ -166,7 +176,7 @@ html_template = """
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Assistência IA Prof. Cláudia Pinheiro</title>
+    <title>Assistência IA da Prof. Cláudia Pinheiro</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
         body {
@@ -282,7 +292,8 @@ def home():
         pergunta_usuario = request.form["pergunta"]
         session['conversa'].append({'role': 'user', 'text': pergunta_usuario})
         
-        resposta_ia = responder(pergunta_usuario)
+        # Passa a conversa inteira para a função responder para que ela entenda o contexto
+        resposta_ia = responder(pergunta_usuario, session['conversa'])
         session['conversa'].append({'role': 'ai', 'text': resposta_ia})
         
     return render_template_string(html_template, conversa=session.get('conversa', []))
