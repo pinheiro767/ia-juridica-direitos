@@ -4,6 +4,7 @@ import requests
 from xml.etree import ElementTree
 import json
 import os
+import numpy as np
 
 # ========= SEU CÓDIGO A PARTIR DAQUI ========
 
@@ -115,7 +116,6 @@ def responder_avancado(pergunta: str, incluir_artigos=True) -> str:
             candidatos.append(texto)
             referencias[texto] = (tema, area)
     candidato_embeddings = model.encode(candidatos)
-    import numpy as np
     similaridades = util.cos_sim(pergunta_embedding, candidato_embeddings)[0]
     idx_max = int(np.argmax(similaridades))
     texto_selecionado = candidatos[idx_max]
@@ -147,31 +147,92 @@ html_template = """
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Assistência IA Prof. Cláudia Pinheiro</title>
+    <title>Assistência IA da Prof. Cláudia Pinheiro</title>
     <style>
-        body { font-family: sans-serif; max-width: 600px; margin: auto; padding: 20px; }
-        .chat-container { border: 1px solid #ccc; padding: 10px; border-radius: 8px; }
-        .message { margin-bottom: 10px; padding: 8px; border-radius: 6px; }
-        .user-message { background-color: #007bff; color: white; text-align: right; }
-        .ai-message { background-color: #f1f1f1; color: black; }
-        form { margin-top: 20px; }
-        input[type="text"] { width: 80%; padding: 8px; border-radius: 4px; border: 1px solid #ccc; }
-        input[type="submit"] { padding: 8px 12px; border: none; border-radius: 4px; background-color: #28a745; color: white; cursor: pointer; }
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f0f2f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 500px;
+        }
+        h1 {
+            color: #2c3e50;
+            font-weight: 600;
+            text-align: center;
+            margin-top: 0;
+            margin-bottom: 20px;
+        }
+        .chat-box {
+            background-color: #ecf0f1;
+            padding: 20px;
+            border-radius: 8px;
+            min-height: 200px;
+            overflow-y: auto;
+            margin-bottom: 20px;
+        }
+        .message {
+            margin-bottom: 15px;
+            line-height: 1.5;
+        }
+        .ai-message {
+            background-color: #e0f7fa;
+            color: #00796b;
+            padding: 12px;
+            border-radius: 8px;
+        }
+        form {
+            display: flex;
+            gap: 10px;
+        }
+        input[type="text"] {
+            flex-grow: 1;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid #bdc3c7;
+            font-family: 'Poppins', sans-serif;
+        }
+        button {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            background-color: #2980b9;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #2471a5;
+        }
     </style>
 </head>
 <body>
-    <h1>Assistência IA da Prof. Cláudia Pinheiro</h1>
-    <div class="chat-container">
-        {% if resposta %}
-        <div class="ai-message">
-            <p>{{ resposta | replace('\n', '<br>') | safe }}</p>
+    <div class="container">
+        <h1>Assistência IA da Prof. Cláudia Pinheiro</h1>
+        <div class="chat-box">
+            {% if resposta %}
+            <div class="ai-message">
+                <p>{{ resposta | replace('\n', '<br>') | safe }}</p>
+            </div>
+            {% endif %}
         </div>
-        {% endif %}
+        <form method="post">
+            <input type="text" name="pergunta" placeholder="Digite sua mensagem...">
+            <button type="submit">Enviar</button>
+        </form>
     </div>
-    <form method="post">
-        <input type="text" name="pergunta" placeholder="Digite sua mensagem...">
-        <input type="submit" value="Enviar">
-    </form>
 </body>
 </html>
 """
