@@ -161,11 +161,14 @@ html_template = """
         }
         .container {
             background-color: white;
-            padding: 30px;
+            padding: 20px;
             border-radius: 12px;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
             width: 100%;
             max-width: 500px;
+            display: flex;
+            flex-direction: column;
+            height: 80vh; /* Altura do contêiner */
         }
         h1 {
             color: #2c3e50;
@@ -174,23 +177,35 @@ html_template = """
             margin-top: 0;
             margin-bottom: 20px;
         }
-        .chat-box {
-            background-color: #ecf0f1;
-            padding: 20px;
-            border-radius: 8px;
-            min-height: 200px;
+        .chat-container {
+            flex-grow: 1;
             overflow-y: auto;
+            padding: 10px;
+            border: 1px solid #bdc3c7;
+            border-radius: 8px;
             margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
         }
         .message {
-            margin-bottom: 15px;
-            line-height: 1.5;
+            margin-bottom: 10px;
+            padding: 10px 15px;
+            border-radius: 20px;
+            max-width: 70%;
+        }
+        .user-message {
+            background-color: #2980b9;
+            color: white;
+            align-self: flex-end;
+            text-align: right;
+            border-bottom-right-radius: 5px;
         }
         .ai-message {
-            background-color: #e0f7fa;
-            color: #00796b;
-            padding: 12px;
-            border-radius: 8px;
+            background-color: #ecf0f1;
+            color: black;
+            align-self: flex-start;
+            text-align: left;
+            border-bottom-left-radius: 5px;
         }
         form {
             display: flex;
@@ -221,9 +236,9 @@ html_template = """
 <body>
     <div class="container">
         <h1>Assistência IA da Prof. Cláudia Pinheiro</h1>
-        <div class="chat-box">
+        <div class="chat-container">
             {% if resposta %}
-            <div class="ai-message">
+            <div class="message ai-message">
                 <p>{{ resposta | replace('\n', '<br>') | safe }}</p>
             </div>
             {% endif %}
