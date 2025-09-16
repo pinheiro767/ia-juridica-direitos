@@ -77,6 +77,9 @@ knowledge_base = {
     }
 }
 
+# Carregando o modelo de IA uma única vez, fora das funções
+model = SentenceTransformer('all-MiniLM-L6-v2')
+
 # ===== Função para buscar artigos com cache =====
 def buscar_artigos_com_cache(query, max_results=3):
     cache = carregar_cache()
@@ -106,7 +109,6 @@ def buscar_artigos_com_cache(query, max_results=3):
 
 # ===== Função avançada para responder =====
 def responder_avancado(pergunta: str, incluir_artigos=True) -> str:
-    model = SentenceTransformer('all-MiniLM-L6-v2')
     pergunta_embedding = model.encode(pergunta)
     candidatos = []
     referencias = {}
